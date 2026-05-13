@@ -452,6 +452,29 @@ export const Button: React.FC<ButtonProps> = ({
 };
 ```
 
+### 🗂️ **Route Hygiene**
+
+> **⚠️ Do not commit backup, temporary, or alternate route files to the app tree.**
+
+Each route directory (e.g., `app/auth/signin/`, `app/settings/`) must contain only its **canonical** `page.tsx` (and supporting files like `layout.tsx`). Files with suffixes like `-backup`, `-temp`, `-old`, `-restored`, `.new`, or similar **must not** be committed.
+
+**Why?** Stale route variants increase maintenance burden, create routing confusion in Next.js, and risk shipping dead code to production.
+
+```bash
+# ❌ Never commit these patterns
+page-backup.tsx
+page-temp.tsx
+page-old-backup.tsx
+route.new.ts
+
+# ✅ Only canonical route files
+page.tsx
+layout.tsx
+route.ts
+```
+
+If you need to preserve work-in-progress locally, use `git stash` or keep drafts in a personal branch — not in the active source tree.
+
 ### ✅ **Code Quality Checks**
 
 Before submitting any PR, ensure:
