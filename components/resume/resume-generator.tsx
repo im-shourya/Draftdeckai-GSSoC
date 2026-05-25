@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -60,7 +60,13 @@ export function ResumeGenerator({ initialSession }: { initialSession?: any }) {
   const [email, setEmail] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [resumeData, setResumeData] = useState<any>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState("professional");
+  // Persist selected template across sessions (#430)
+  const [selectedTemplate, setSelectedTemplate] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("draftdeck:selectedTemplate") ?? "professional";
+    }
+    return "professional";
+  });
   const [previewKey, setPreviewKey] = useState(0); // bumped on template switch for fade animation
   const [isFullView, setIsFullView] = useState(false);
   const [shareUrl, setShareUrl] = useState<string>("");
@@ -72,10 +78,13 @@ export function ResumeGenerator({ initialSession }: { initialSession?: any }) {
   const { isPro } = useSubscription();
   const [customColors, setCustomColors] = useState<ResumeStyleColors>({ ...DEFAULT_STYLE_COLORS });
 
-  /** Switches template and triggers a fade-in animation on the preview (#430) */
+  /** Switches template, persists choice to localStorage, triggers fade animation (#430) */
   const handleTemplateSwitch = useCallback((id: string) => {
     setSelectedTemplate(id);
     setPreviewKey((k) => k + 1);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("draftdeck:selectedTemplate", id);
+    }
   }, []);
 
   const generateResume = async () => {
