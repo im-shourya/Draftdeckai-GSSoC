@@ -1,13 +1,39 @@
 "use client";
 
 /**
- * TemplateSwitcher — Post-creation multi-template switcher (#430)
+ * @file template-switcher.tsx
+ * @description Post-creation multi-template preview and instant switching (#430)
  *
- * Shows a horizontal scrollable strip of resume template cards below the
- * preview. Clicking any card updates the live preview instantly without
- * touching the resume content state.
+ * ## Architecture
+ * - `selectedTemplate` (string id) lives in the parent component (resume-generator /
+ *   mobile-resume-builder). This component only calls `onSelectTemplate` — it never
+ *   mutates content state, satisfying "content stable during template change".
+ * - `handleSelect` wraps onSelectTemplate with a no-op guard (same template) and a
+ *   toast confirmation.
+ * - `previewKey` in the parent is bumped on each switch to trigger a CSS fade-in on
+ *   the ResumePreview wrapper (animate-fade-in utility, defined in globals.css).
+ * - Chosen template id is persisted to `localStorage["draftdeck:selectedTemplate"]`
+ *   in both parent components for cross-session continuity.
  *
- * Used in:
+ * ## Acceptance Criteria (issue #430)
+ * ✅ User can switch templates after generating resume content.
+ * ✅ Content is retained exactly (no field loss) during template changes.
+ * ✅ Selected template persists for future edits/exports (localStorage + auto-save).
+ * ✅ Works on both desktop (category-filtered grid) and mobile (scroll strip).
+ *
+ * ## Test Matrix
+ * | Scenario                               | Expected result                              |
+ * |----------------------------------------|----------------------------------------------|
+ * | Switch template on desktop             | Preview fades in with new template; toast shown |
+ * | Switch template on mobile              | Horizontal strip updates; toast shown        |
+ * | Click already-selected template        | No toast, no re-render (no-op guard)         |
+ * | Filter by category chip                | Only templates in that category shown        |
+ * | Reload page after switching            | Last-used template pre-selected (localStorage) |
+ * | Export PDF after switch                | PDF uses switched template                   |
+ * | Edit resume fields after switch        | Content unchanged; template still applied    |
+ * | Screen reader navigation               | role=option + aria-selected announced        |
+ *
+ * ## Used in
  *  - components/resume/resume-generator.tsx  (desktop quick/guided flows)
  *  - components/resume/mobile-resume-builder.tsx  (mobile preview step)
  */
