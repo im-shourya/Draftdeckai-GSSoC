@@ -17,6 +17,7 @@ import { RESUME_TEMPLATES } from "@/lib/resume-template-data";
 import { cn } from "@/lib/utils";
 import { Layers, ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 // Only surface resume (not presentation) templates
 const RESUME_ONLY = RESUME_TEMPLATES.filter((t) => t.type === "resume");
@@ -39,6 +40,18 @@ export function TemplateSwitcher({
   className,
 }: TemplateSwitcherProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { toast } = useToast();
+
+  /** Notify and delegate to parent handler (#430) */
+  const handleSelect = (id: string) => {
+    if (id === selectedTemplate) return; // no-op if already selected
+    const tmpl = RESUME_ONLY.find((t) => t.id === id);
+    onSelectTemplate(id);
+    toast({
+      title: "Template applied ✨",
+      description: `Switched to "${tmpl?.title ?? id}". Your content is unchanged.`,
+    });
+  };
 
   // How many templates to show before "show more"
   const INITIAL_VISIBLE = compact ? RESUME_ONLY.length : 4;
@@ -77,7 +90,7 @@ export function TemplateSwitcher({
               key={tmpl.id}
               template={tmpl}
               isSelected={selectedTemplate === tmpl.id}
-              onSelect={() => onSelectTemplate(tmpl.id)}
+              onSelect={() => handleSelect(tmpl.id)}
             />
           ))}
         </div>
@@ -90,7 +103,7 @@ export function TemplateSwitcher({
                 key={tmpl.id}
                 template={tmpl}
                 isSelected={selectedTemplate === tmpl.id}
-                onSelect={() => onSelectTemplate(tmpl.id)}
+                onSelect={() => handleSelect(tmpl.id)}
               />
             ))}
           </div>
