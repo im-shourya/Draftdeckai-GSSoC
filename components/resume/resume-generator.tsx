@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -61,6 +61,7 @@ export function ResumeGenerator({ initialSession }: { initialSession?: any }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [resumeData, setResumeData] = useState<any>(null);
   const [selectedTemplate, setSelectedTemplate] = useState("professional");
+  const [previewKey, setPreviewKey] = useState(0); // bumped on template switch for fade animation
   const [isFullView, setIsFullView] = useState(false);
   const [shareUrl, setShareUrl] = useState<string>("");
   const [resumeId, setResumeId] = useState<string>("");
@@ -70,6 +71,12 @@ export function ResumeGenerator({ initialSession }: { initialSession?: any }) {
   const { toast } = useToast();
   const { isPro } = useSubscription();
   const [customColors, setCustomColors] = useState<ResumeStyleColors>({ ...DEFAULT_STYLE_COLORS });
+
+  /** Switches template and triggers a fade-in animation on the preview (#430) */
+  const handleTemplateSwitch = useCallback((id: string) => {
+    setSelectedTemplate(id);
+    setPreviewKey((k) => k + 1);
+  }, []);
 
   const generateResume = async () => {
     if (!prompt.trim()) {
@@ -499,7 +506,9 @@ export function ResumeGenerator({ initialSession }: { initialSession?: any }) {
                   </Button>
                 </div>
 
-                <div className={`glass-effect border border-yellow-400/20 rounded-xl overflow-hidden bg-white transition-all duration-300 ${isFullView ? "fixed inset-4 z-50 shadow-2xl" : ""
+                <div
+                  key={previewKey}
+                  className={`glass-effect border border-yellow-400/20 rounded-xl overflow-hidden bg-white transition-all duration-300 animate-fade-in ${isFullView ? "fixed inset-4 z-50 shadow-2xl" : ""
                   }`}>
                   <div className="absolute inset-0 shimmer opacity-10"></div>
                   <div className="relative z-10">
@@ -510,7 +519,7 @@ export function ResumeGenerator({ initialSession }: { initialSession?: any }) {
                 {/* Template Switcher (#430) */}
                 <TemplateSwitcher
                   selectedTemplate={selectedTemplate}
-                  onSelectTemplate={setSelectedTemplate}
+                  onSelectTemplate={handleTemplateSwitch}
                   className="mt-4"
                 />
 
@@ -766,7 +775,8 @@ export function ResumeGenerator({ initialSession }: { initialSession?: any }) {
                 {resumeData ? (
                   <>
                     <div
-                      className={`glass-effect border border-yellow-400/20 rounded-xl overflow-y-auto bg-white transition-all duration-300 ${isFullView ? "fixed inset-4 z-50 shadow-2xl" : "overflow-hidden"
+                      key={previewKey}
+                      className={`glass-effect border border-yellow-400/20 rounded-xl overflow-y-auto bg-white transition-all duration-300 animate-fade-in ${isFullView ? "fixed inset-4 z-50 shadow-2xl" : "overflow-hidden"
                         }`}
                     >
                       <div className="absolute inset-0 shimmer opacity-10"></div>
@@ -782,7 +792,7 @@ export function ResumeGenerator({ initialSession }: { initialSession?: any }) {
                     {/* Template Switcher (#430) */}
                     <TemplateSwitcher
                       selectedTemplate={selectedTemplate}
-                      onSelectTemplate={setSelectedTemplate}
+                      onSelectTemplate={handleTemplateSwitch}
                       className="mt-4"
                     />
                   </>
