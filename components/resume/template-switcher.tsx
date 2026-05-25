@@ -69,6 +69,8 @@ export function TemplateSwitcher({
 
   return (
     <div
+      role="region"
+      aria-label="Resume template switcher"
       className={cn(
         "glass-effect border border-yellow-400/20 rounded-xl p-4",
         className
@@ -93,7 +95,10 @@ export function TemplateSwitcher({
       {/* Template strip / grid */}
       {compact ? (
         /* --- Mobile: horizontal scroll strip --- */
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide snap-x snap-mandatory">
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide snap-x snap-mandatory"
+          role="listbox"
+          aria-label="Resume templates"
+        >
           {visibleTemplates.map((tmpl) => (
             <MobileTemplateCard
               key={tmpl.id}
@@ -112,6 +117,8 @@ export function TemplateSwitcher({
               <button
                 key={cat}
                 type="button"
+                aria-label={`Filter by ${cat} templates`}
+                aria-pressed={activeCategory === cat}
                 onClick={() => { setActiveCategory(cat); setIsExpanded(false); }}
                 className={cn(
                   "text-[10px] font-medium px-2.5 py-1 rounded-full border transition-all duration-150",
@@ -125,7 +132,7 @@ export function TemplateSwitcher({
             ))}
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" role="listbox" aria-label="Resume templates">
             {visibleTemplates.map((tmpl) => (
               <DesktopTemplateCard
                 key={tmpl.id}
@@ -177,6 +184,9 @@ function DesktopTemplateCard({
   return (
     <button
       type="button"
+      role="option"
+      aria-selected={isSelected}
+      aria-label={`${template.title} template${isSelected ? ' (currently selected)' : ''}`}
       onClick={onSelect}
       title={template.title}
       className={cn(
@@ -234,6 +244,9 @@ function MobileTemplateCard({
   return (
     <button
       type="button"
+      role="option"
+      aria-selected={isSelected}
+      aria-label={`${template.title} template${isSelected ? ' (currently selected)' : ''}`}
       onClick={onSelect}
       className={cn(
         "relative flex-shrink-0 snap-start flex flex-col items-center gap-1 p-2.5 rounded-lg border-2 transition-all duration-200 w-[88px] focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400",
