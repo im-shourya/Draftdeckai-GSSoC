@@ -22,6 +22,9 @@ import { useToast } from "@/hooks/use-toast";
 // Only surface resume (not presentation) templates
 const RESUME_ONLY = RESUME_TEMPLATES.filter((t) => t.type === "resume");
 
+// Derive unique categories for filter chips
+const CATEGORIES = ["All", ...Array.from(new Set(RESUME_ONLY.map((t) => t.category)))];
+
 interface TemplateSwitcherProps {
   /** Currently selected template id */
   selectedTemplate: string;
@@ -40,6 +43,7 @@ export function TemplateSwitcher({
   className,
 }: TemplateSwitcherProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [activeCategory, setActiveCategory] = useState("All"); // category filter for desktop (#430)
   const { toast } = useToast();
 
   /** Notify and delegate to parent handler (#430) */
@@ -53,10 +57,15 @@ export function TemplateSwitcher({
     });
   };
 
-  // How many templates to show before "show more"
-  const INITIAL_VISIBLE = compact ? RESUME_ONLY.length : 4;
+  // Filter by active category then apply expand/compact logic
+  const categoryFiltered =
+    activeCategory === "All"
+      ? RESUME_ONLY
+      : RESUME_ONLY.filter((t) => t.category === activeCategory);
+
+  const INITIAL_VISIBLE = compact ? categoryFiltered.length : 4;
   const visibleTemplates =
-    isExpanded || compact ? RESUME_ONLY : RESUME_ONLY.slice(0, INITIAL_VISIBLE);
+    isExpanded || compact ? categoryFiltered : categoryFiltered.slice(0, INITIAL_VISIBLE);
 
   return (
     <div
@@ -95,8 +104,27 @@ export function TemplateSwitcher({
           ))}
         </div>
       ) : (
-        /* --- Desktop: 2-per-row grid with expand --- */
+        /* --- Desktop: category chips + grid with expand --- */
         <>
+          {/* Category filter chips (#430) */}
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => { setActiveCategory(cat); setIsExpanded(false); }}
+                className={cn(
+                  "text-[10px] font-medium px-2.5 py-1 rounded-full border transition-all duration-150",
+                  activeCategory === cat
+                    ? "bg-yellow-400/20 border-yellow-400 text-yellow-700 dark:text-yellow-300"
+                    : "border-gray-200 dark:border-gray-700 text-muted-foreground hover:border-yellow-400/50 hover:text-foreground"
+                )}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {visibleTemplates.map((tmpl) => (
               <DesktopTemplateCard
