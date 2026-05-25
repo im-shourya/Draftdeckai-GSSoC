@@ -13,6 +13,7 @@ import jsPDF from 'jspdf';
 import { ResumePreview } from "@/components/resume/resume-preview";
 import { exportToLaTeXFile } from "@/lib/resume/latex-exporter";
 import { ResumeTemplates } from "@/components/resume/resume-templates";
+import { TemplateSwitcher } from "@/components/resume/template-switcher";
 import { GuidedResumeGenerator } from "@/components/resume/guided-resume-generator";
 import { LinkedInImport } from "@/components/resume/linkedin-import";
 import { TextColorPanel } from "@/components/resume/text-color-panel";
@@ -506,6 +507,13 @@ export function ResumeGenerator({ initialSession }: { initialSession?: any }) {
                   </div>
                 </div>
 
+                {/* Template Switcher (#430) */}
+                <TemplateSwitcher
+                  selectedTemplate={selectedTemplate}
+                  onSelectTemplate={setSelectedTemplate}
+                  className="mt-4"
+                />
+
                 {/* Text Color Controls (#429) */}
                 <div className="mt-4">
                   <TextColorPanel colors={customColors} onChange={setCustomColors} />
@@ -756,19 +764,28 @@ export function ResumeGenerator({ initialSession }: { initialSession?: any }) {
                 </div>
 
                 {resumeData ? (
-                  <div
-                    className={`glass-effect border border-yellow-400/20 rounded-xl overflow-y-auto bg-white transition-all duration-300 ${isFullView ? "fixed inset-4 z-50 shadow-2xl" : "overflow-hidden"
-                      }`}
-                  >
-                    <div className="absolute inset-0 shimmer opacity-10"></div>
-                    <div className="relative z-10">
-                      <ResumePreview
-                        resume={resumeData}
-                        template={selectedTemplate}
-                        customColors={customColors}
-                      />
+                  <>
+                    <div
+                      className={`glass-effect border border-yellow-400/20 rounded-xl overflow-y-auto bg-white transition-all duration-300 ${isFullView ? "fixed inset-4 z-50 shadow-2xl" : "overflow-hidden"
+                        }`}
+                    >
+                      <div className="absolute inset-0 shimmer opacity-10"></div>
+                      <div className="relative z-10">
+                        <ResumePreview
+                          resume={resumeData}
+                          template={selectedTemplate}
+                          customColors={customColors}
+                        />
+                      </div>
                     </div>
-                  </div>
+
+                    {/* Template Switcher (#430) */}
+                    <TemplateSwitcher
+                      selectedTemplate={selectedTemplate}
+                      onSelectTemplate={setSelectedTemplate}
+                      className="mt-4"
+                    />
+                  </>
                 ) : (
                   <Card className="glass-effect border border-yellow-400/20 flex items-center justify-center min-h-[500px] relative overflow-hidden">
                     <div className="absolute inset-0 shimmer opacity-10"></div>

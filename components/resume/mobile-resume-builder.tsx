@@ -25,6 +25,7 @@ import { ATSScoreDisplay } from "./ats-score-display";
 import { AIResumeChat } from "./ai-resume-chat";
 import { TextColorPanel } from "./text-color-panel";
 import { RESUME_TEMPLATES } from "@/lib/resume-template-data";
+import { TemplateSwitcher } from "./template-switcher";
 import { ResumeStyleColors, DEFAULT_STYLE_COLORS } from "@/lib/resume-style-colors";
 import { userProfileService } from "@/lib/user-profile-service";
 import { TemplateCustomizationPanel } from "@/components/templates/template-customization-panel";
@@ -2511,6 +2512,14 @@ Certified AWS Solutions Architect
                     <div className="mt-4">
                       <TextColorPanel colors={customColors} onChange={setCustomColors} compact />
                     </div>
+
+                    {/* Template Switcher (#430) — compact horizontal strip */}
+                    <TemplateSwitcher
+                      selectedTemplate={selectedTemplate}
+                      onSelectTemplate={setSelectedTemplate}
+                      compact
+                      className="mt-4"
+                    />
 
                     {/* Download & Edit Buttons */}
                     <div className="flex flex-col sm:flex-row gap-4">
