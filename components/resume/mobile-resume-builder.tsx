@@ -63,7 +63,22 @@ export function MobileResumeBuilder({ templateId, resumeId }: MobileResumeBuilde
   const [isPublished, setIsPublished] = useState(false);
   const [publishedUrl, setPublishedUrl] = useState("");
   const [showShareDialog, setShowShareDialog] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState("modern");
+  // Persist selected template across sessions — shared key with desktop (#430)
+  const [selectedTemplate, setSelectedTemplateRaw] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("draftdeck:selectedTemplate") ?? "modern";
+    }
+    return "modern";
+  });
+
+  /** Persists template choice and updates state (#430) */
+  const setSelectedTemplate = (id: string) => {
+    setSelectedTemplateRaw(id);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("draftdeck:selectedTemplate", id);
+    }
+  };
+
   const [scale, setScale] = useState(1);
   const isMobile = useIsMobile(); // Automatically detect mobile
   const [viewMode, setViewMode] = useState<'fit' | 'actual' | 'mobile'>('mobile');
